@@ -34532,11 +34532,11 @@ function run() {
         }
         const run_arg = getInput('run', { required: false });
         if (run_arg) {
-            args.push('-run', run_arg);
+            args.push('-run', `"${run_arg}"`);
         }
         const skip_arg = getInput('skip', { required: false });
         if (skip_arg) {
-            args.push('-skip', skip_arg);
+            args.push('-skip', `"${skip_arg}"`);
         }
         const parallel_arg = getInput('parallel', { required: false });
         if (parallel_arg) {

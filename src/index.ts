@@ -37,12 +37,12 @@ async function run() {
 
     const run_arg = core.getInput('run', { required: false });
     if (run_arg) {
-        args.push('-run', run_arg);
+        args.push('-run', `"${run_arg}"`);
     }
 
     const skip_arg = core.getInput('skip', { required: false });
     if (skip_arg) {
-        args.push('-skip', skip_arg);
+        args.push('-skip', `"${skip_arg}"`);
     }
 
     const parallel_arg = core.getInput('parallel', { required: false });
