@@ -5,8 +5,13 @@ import * as exec from '@actions/exec';
 import * as tc from '@actions/tool-cache';
 
 import { ungzip } from 'node-gzip';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
-const tomlTestURL = 'https://github.com/BurntSushi/toml-test/releases/download/v1.2.0/toml-test-v1.2.0-linux-amd64.gz';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const tomlTestURL = 'https://github.com/BurntSushi/toml-test/releases/download/v2.1.0/toml-test-v2.1.0-linux-amd64.gz';
 
 async function run() {
     const tomlTestPath = await core.group("Download toml-test binary", async () => {
@@ -23,9 +28,9 @@ async function run() {
         core.addPath(tomlTestExtractedPath);
         return tomlTestExtractedPath;
     });
-    
+
     const args = [];
-    
+
     if (core.getInput('encoder', { required: false })) {
         args.push('-encoder');
     }
@@ -42,12 +47,12 @@ async function run() {
 
     const parallel_arg = core.getInput('parallel', { required: false });
     if (parallel_arg) {
-        args.push('-parallel', parallel);
+        args.push('-parallel', parallel_arg);
     }
 
     const timeout_arg = core.getInput('timeout', { required: false });
     if (timeout_arg) {
-        args.push('-timeout', timeout);
+        args.push('-timeout', timeout_arg);
     }
 
     const test_dir_arg = core.getInput('test_dir', { required: false });
@@ -61,8 +66,6 @@ async function run() {
     await exec.exec(`"${tomlTestPath}"`, args);
 }
 
-if (require.main === module) {
-    run().catch((e) => {
-        core.setFailed(e);
-    });
-}
+run().catch((e) => {
+    core.setFailed(e);
+});
