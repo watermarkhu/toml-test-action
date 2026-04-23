@@ -34527,31 +34527,33 @@ function run() {
             return tomlTestExtractedPath;
         }));
         const args = [];
+        // Add command and its arguments first
+        const command_arg = getInput('command', { required: true });
+        args.push('-v', '-v', '--', ...command_arg.split(' '));
+        // Then add toml-test options
         if (getInput('encoder', { required: false })) {
-            args.push('-encoder');
+            args.unshift('-encoder');
         }
         const run_arg = getInput('run', { required: false });
         if (run_arg) {
-            args.push('-run', `"${run_arg}"`);
+            args.unshift('-run', run_arg);
         }
         const skip_arg = getInput('skip', { required: false });
         if (skip_arg) {
-            args.push('-skip', `"${skip_arg}"`);
+            args.unshift('-skip', skip_arg);
         }
         const parallel_arg = getInput('parallel', { required: false });
         if (parallel_arg) {
-            args.push('-parallel', parallel_arg);
+            args.unshift('-parallel', parallel_arg);
         }
         const timeout_arg = getInput('timeout', { required: false });
         if (timeout_arg) {
-            args.push('-timeout', timeout_arg);
+            args.unshift('-timeout', timeout_arg);
         }
         const test_dir_arg = getInput('test_dir', { required: false });
         if (test_dir_arg) {
-            args.push('-testdir', test_dir_arg);
+            args.unshift('-testdir', test_dir_arg);
         }
-        const command_arg = getInput('command', { required: true });
-        args.push('-v', '-v', '--', ...command_arg.split(' '));
         yield exec_exec(`"${tomlTestPath}"`, args);
     });
 }

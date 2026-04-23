@@ -31,37 +31,39 @@ async function run() {
 
     const args = [];
 
+    // Add command and its arguments first
+    const command_arg = core.getInput('command', { required: true });
+    args.push('-v', '-v', '--', ...command_arg.split(' '));
+
+    // Then add toml-test options
     if (core.getInput('encoder', { required: false })) {
-        args.push('-encoder');
+        args.unshift('-encoder');
     }
 
     const run_arg = core.getInput('run', { required: false });
     if (run_arg) {
-        args.push('-run', `"${run_arg}"`);
+        args.unshift('-run', run_arg);
     }
 
     const skip_arg = core.getInput('skip', { required: false });
     if (skip_arg) {
-        args.push('-skip', `"${skip_arg}"`);
+        args.unshift('-skip', skip_arg);
     }
 
     const parallel_arg = core.getInput('parallel', { required: false });
     if (parallel_arg) {
-        args.push('-parallel', parallel_arg);
+        args.unshift('-parallel', parallel_arg);
     }
 
     const timeout_arg = core.getInput('timeout', { required: false });
     if (timeout_arg) {
-        args.push('-timeout', timeout_arg);
+        args.unshift('-timeout', timeout_arg);
     }
 
     const test_dir_arg = core.getInput('test_dir', { required: false });
     if (test_dir_arg) {
-        args.push('-testdir', test_dir_arg);
+        args.unshift('-testdir', test_dir_arg);
     }
-
-    const command_arg = core.getInput('command', { required: true });
-    args.push('-v', '-v', '--', ...command_arg.split(' '));
 
     await exec.exec(`"${tomlTestPath}"`, args);
 }
