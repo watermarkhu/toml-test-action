@@ -25,13 +25,10 @@ inputs:
     description: >-
       Timeout for each test case
     required: false
-  test_dir:
-    description: >-
-      Directory of tests, overriding builtin tests
-    required: false
+
 runs:
-  using: node16
+  using: node20
   main: dist/index.js
 branding:
-  icon: 'file-text'
-  color: 'orange'
+  icon: "file-text"
+  color: "orange"

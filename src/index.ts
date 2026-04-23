@@ -5,11 +5,6 @@ import * as exec from '@actions/exec';
 import * as tc from '@actions/tool-cache';
 
 import { ungzip } from 'node-gzip';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 const tomlTestURL = 'https://github.com/BurntSushi/toml-test/releases/download/v2.1.0/toml-test-v2.1.0-linux-amd64.gz';
 
@@ -25,15 +20,19 @@ async function run() {
         await chmod(tomlTestExtractedPath, 0o777);
         console.log("toml-test binary extracted to:", tomlTestExtractedPath);
 
-        core.addPath(tomlTestExtractedPath);
+        core.addPath(tomlTestExtractedPath.slice(0, tomlTestExtractedPath.lastIndexOf('/')));
         return tomlTestExtractedPath;
     });
 
-    const args = [];
+    // toml-test v2.x uses a "test" subcommand
+    const args = ['test'];
 
-    // Add toml-test options first
+    // -decoder is required; -encoder is optional
+    const command_arg = core.getInput('command', { required: true });
+    args.push(`-decoder=${command_arg}`);
+
     if (core.getInput('encoder', { required: false })) {
-        args.push('-encoder');
+        args.push(`-encoder=${command_arg}`);
     }
 
     const run_arg = core.getInput('run', { required: false });
@@ -56,17 +55,9 @@ async function run() {
         args.push('-timeout', timeout_arg);
     }
 
-    const test_dir_arg = core.getInput('test_dir', { required: false });
-    if (test_dir_arg) {
-        args.push('-testdir', test_dir_arg);
-    }
+    args.push('-v', '-v');
 
-    // Add verbosity and command last
-    args.push('-v', '-v', '--');
-    const command_arg = core.getInput('command', { required: true });
-    args.push(...command_arg.split(' '));
-
-    await exec.exec(`"${tomlTestPath}"`, args);
+    await exec.exec(tomlTestPath, args);
 }
 
 run().catch((e) => {

@@ -34490,8 +34490,6 @@ function _unique(values) {
 //# sourceMappingURL=tool-cache.js.map
 // EXTERNAL MODULE: ./node_modules/node-gzip/dist/index.js
 var dist = __nccwpck_require__(4064);
-;// CONCATENATED MODULE: external "url"
-const external_url_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("url");
 ;// CONCATENATED MODULE: ./src/index.ts
 var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -34507,10 +34505,6 @@ var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argu
 
 
 
-
-
-const src_filename = (0,external_url_namespaceObject.fileURLToPath)(import.meta.url);
-const src_dirname = (0,external_path_namespaceObject.dirname)(src_filename);
 const tomlTestURL = 'https://github.com/BurntSushi/toml-test/releases/download/v2.1.0/toml-test-v2.1.0-linux-amd64.gz';
 function run() {
     return src_awaiter(this, void 0, void 0, function* () {
@@ -34523,13 +34517,16 @@ function run() {
             yield (0,promises_namespaceObject.writeFile)(tomlTestExtractedPath, unzipped);
             yield (0,promises_namespaceObject.chmod)(tomlTestExtractedPath, 0o777);
             console.log("toml-test binary extracted to:", tomlTestExtractedPath);
-            addPath(tomlTestExtractedPath);
+            addPath(tomlTestExtractedPath.slice(0, tomlTestExtractedPath.lastIndexOf('/')));
             return tomlTestExtractedPath;
         }));
-        const args = [];
-        // Add toml-test options first
+        // toml-test v2.x uses a "test" subcommand
+        const args = ['test'];
+        // -decoder is required; -encoder is optional
+        const command_arg = getInput('command', { required: true });
+        args.push(`-decoder=${command_arg}`);
         if (getInput('encoder', { required: false })) {
-            args.push('-encoder');
+            args.push(`-encoder=${command_arg}`);
         }
         const run_arg = getInput('run', { required: false });
         if (run_arg) {
@@ -34547,15 +34544,8 @@ function run() {
         if (timeout_arg) {
             args.push('-timeout', timeout_arg);
         }
-        const test_dir_arg = getInput('test_dir', { required: false });
-        if (test_dir_arg) {
-            args.push('-testdir', test_dir_arg);
-        }
-        // Add verbosity and command last
-        args.push('-v', '-v', '--');
-        const command_arg = getInput('command', { required: true });
-        args.push(...command_arg.split(' '));
-        yield exec_exec(`"${tomlTestPath}"`, args);
+        args.push('-v', '-v');
+        yield exec_exec(tomlTestPath, args);
     });
 }
 run().catch((e) => {
